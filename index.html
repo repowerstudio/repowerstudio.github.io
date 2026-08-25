@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RepowerStudio · GitHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 30% 20%, #0d1a2b, #060b12);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            overflow-x: hidden;
+        }
+
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .glass-card {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(18, 30, 50, 0.30);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 3rem;
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+            animation: cardAppear 0.7s ease;
+        }
+
+        @keyframes cardAppear {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .avatar-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 2px solid rgba(138, 180, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar .fallback-icon {
+            font-size: 2.2rem;
+            color: #8ab4ff;
+            opacity: 0.6;
+        }
+
+        .brand-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            font-size: clamp(1.6rem, 4vw, 2.6rem);
+            font-weight: 700;
+            background: linear-gradient(145deg, #f0f5ff, #b0d0ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.1;
+        }
+
+        .brand-sub {
+            font-size: 0.7rem;
+            color: rgba(180, 200, 230, 0.3);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .badge-github {
+            margin-left: auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.4rem 1rem;
+            border-radius: 60px;
+            font-size: 0.75rem;
+            color: #b0caf0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .badge-github:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.02);
+        }
+
+        .badge-github i {
+            color: #8ab4ff;
+        }
+
+        .tagline {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
+            font-weight: 300;
+            color: rgba(200, 218, 255, 0.6);
+            margin-bottom: 2rem;
+            padding-left: 1rem;
+            border-left: 3px solid rgba(120, 180, 255, 0.25);
+        }
+
+        .loader-small {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            color: rgba(180, 210, 255, 0.35);
+        }
+
+        .loader-small .loader-dots {
+            display: inline-flex;
+            gap: 0.2rem;
+        }
+
+        .loader-small .loader-dots span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(180, 210, 255, 0.3);
+            animation: dotPulse 1.4s ease-in-out infinite;
+        }
+
+        .loader-small .loader-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .loader-small .loader-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes dotPulse {
+            0%,
+            80%,
+            100% {
+                transform: scale(0.6);
+                opacity: 0.3;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .repo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.2rem;
+            margin: 1.8rem 0 2.2rem;
+            min-height: 80px;
+        }
+
+        .repo-card {
+            background: rgba(12, 24, 44, 0.30);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 1.8rem;
+            padding: 1.4rem 1.2rem 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+            transition: all 0.2s ease;
+            color: #e0ecff;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: fadeUp 0.35s ease forwards;
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        .repo-card:nth-child(1) { animation-delay: 0.02s; }
+        .repo-card:nth-child(2) { animation-delay: 0.04s; }
+        .repo-card:nth-child(3) { animation-delay: 0.06s; }
+        .repo-card:nth-child(4) { animation-delay: 0.08s; }
+        .repo-card:nth-child(5) { animation-delay: 0.10s; }
+        .repo-card:nth-child(6) { animation-delay: 0.12s; }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .repo-card:hover {
+            transform: translateY(-3px) scale(1.01);
+            background: rgba(25, 45, 75, 0.45);
+            border-color: rgba(160, 200, 255, 0.12);
+            box-shadow: 0 12px 28px rgba(0, 10, 40, 0.4);
+        }
+
+        .repo-card .repo-icon {
+            font-size: 1.4rem;
+            margin-bottom: 0.2rem;
+            display: inline-block;
+            color: #8ab4ff;
+        }
+
+        .repo-card h3 {
+            font-size: 1.05rem;
+            font-weight: 500;
+            margin-bottom: 0.15rem;
+            background: linear-gradient(to right, #d6e8ff, #aac4ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .repo-card .repo-desc {
+            font-size: 0.75rem;
+            opacity: 0.55;
+            line-height: 1.3;
+            margin: 0.15rem 0 0.4rem;
+            min-height: 2.2rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .repo-stats {
+            display: flex;
+            gap: 0.8rem;
+            font-size: 0.65rem;
+            color: rgba(180, 200, 230, 0.4);
+        }
+
+        .repo-stats i {
+            margin-right: 2px;
+            color: #7aafff;
+        }
+
+        .repo-card .release-badge {
+            position: absolute;
+            top: 0.6rem;
+            right: 0.6rem;
+            background: rgba(70, 180, 100, 0.15);
+            border: 1px solid rgba(70, 180, 100, 0.12);
+            color: #7aff9e;
+            font-size: 0.55rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.7rem 2rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: linear-gradient(145deg, #1f3f6a, #132a4a);
+            color: #f0f6ff;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 30, 80, 0.35);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.03);
+            background: linear-gradient(145deg, #2c5180, #17305a);
+            box-shadow: 0 0 25px rgba(60, 140, 255, 0.25);
+        }
+
+        .footer-links {
+            margin-top: 2.2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            padding-top: 1.5rem;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .social-icons a {
+            color: rgba(180, 205, 240, 0.3);
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+
+        .social-icons a:hover {
+            color: #8ab4ff;
+            transform: translateY(-2px);
+        }
+
+        .footer-copy {
+            font-size: 0.7rem;
+            color: rgba(180, 200, 230, 0.15);
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: rgba(180, 210, 255, 0.25);
+            font-size: 0.7rem;
+        }
+
+        .pulse-circle {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #5bb8ff;
+            box-shadow: 0 0 12px #3f8fff;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.3);
+            }
+            100% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+        }
+
+        /* --- Модальное окно --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(18, 30, 50, 0.96);
+            backdrop-filter: blur(16px);
+            border-radius: 2rem;
+            max-width: 850px;
+            width: 100%;
+            max-height: 85vh;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.7);
+            overflow-y: auto;
+            animation: modalIn 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes modalIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.96) translateY(8px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: sticky;
+            top: 0;
+            float: right;
+            background: rgba(255, 255, 255, 0.06);
+            border: none;
+            color: #b0caf0;
+            font-size: 1.2rem;
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            font-weight: 300;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 80, 80, 0.2);
+            color: #ff8a8a;
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            background: linear-gradient(to right, #d6e8ff, #aac4ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .modal-desc {
+            color: rgba(200, 218, 255, 0.6);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .modal-stats {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.2rem;
+        }
+
+        .modal-stat {
+            color: rgba(200, 218, 255, 0.5);
+            font-size: 0.8rem;
+        }
+
+        .modal-stat i {
+            color: #8ab4ff;
+            margin-right: 0.3rem;
+        }
+
+        .modal-section {
+            margin-bottom: 1rem;
+        }
+
+        .modal-section h4 {
+            color: rgba(200, 218, 255, 0.7);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-section h4 i {
+            color: #8ab4ff;
+        }
+
+        /* --- Слайдер изображений --- */
+        .slider-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            margin-top: 0.3rem;
+        }
+
+        .slider-track {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform;
+        }
+
+        .slider-slide {
+            min-width: 100%;
+            flex-shrink: 0;
+            padding: 0.5rem;
+        }
+
+        .slider-slide img {
+            width: 100%;
+            height: 250px;
+            object-fit: contain;
+            border-radius: 0.6rem;
+            background: rgba(0, 0, 0, 0.2);
+            display: block;
+        }
+
+        .slider-slide .slide-name {
+            text-align: center;
+            color: rgba(200, 218, 255, 0.3);
+            font-size: 0.65rem;
+            margin-top: 0.3rem;
+        }
+
+        .slider-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: #fff;
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .slider-btn:hover {
+            background: rgba(70, 140, 255, 0.4);
+        }
+
+        .slider-btn.prev {
+            left: 0.5rem;
+        }
+
+        .slider-btn.next {
+            right: 0.5rem;
+        }
+
+        .slider-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.5rem 0;
+        }
+
+        .slider-dots button {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .slider-dots button.active {
+            background: #8ab4ff;
+            transform: scale(1.2);
+        }
+
+        .slider-dots button:hover {
+            background: rgba(138, 180, 255, 0.4);
+        }
+
+        .modal-code {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 0.8rem;
+            padding: 0.8rem;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: #b0d0f0;
+            white-space: pre-wrap;
+            word-break: break-all;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            max-height: 200px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-code .code-actions {
+            position: sticky;
+            top: 0;
+            float: right;
+            display: flex;
+            gap: 0.4rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .modal-code .code-actions button {
+            background: rgba(255, 255, 255, 0.06);
+            border: none;
+            color: #b0caf0;
+            padding: 0.2rem 0.7rem;
+            border-radius: 0.4rem;
+            cursor: pointer;
+            font-size: 0.65rem;
+            transition: all 0.2s ease;
+        }
+
+        .modal-code .code-actions button:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .modal-files {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .modal-file {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 0.35rem 0.7rem;
+            border-radius: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            transition: all 0.2s ease;
+        }
+
+        .modal-file:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-file span {
+            color: rgba(200, 218, 255, 0.55);
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .modal-file .file-actions {
+            display: flex;
+            gap: 0.2rem;
+        }
+
+        .modal-file .file-actions button {
+            background: rgba(255, 255, 255, 0.03);
+            border: none;
+            color: #b0caf0;
+            padding: 0.1rem 0.4rem;
+            border-radius: 0.3rem;
+            font-size: 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-file .file-actions button:hover {
+            background: rgba(70, 140, 255, 0.15);
+        }
+
+        .modal-release {
+            background: rgba(70, 180, 100, 0.04);
+            border: 1px solid rgba(70, 180, 100, 0.06);
+            border-radius: 0.7rem;
+            padding: 0.6rem 0.8rem;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .modal-release .release-info {
+            flex: 1;
+        }
+
+        .modal-release .release-tag {
+            color: #7aff9e;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .modal-release .release-date {
+            color: rgba(200, 218, 255, 0.3);
+            font-size: 0.65rem;
+            margin-left: 0.6rem;
+        }
+
+        .modal-release .release-name {
+            color: rgba(200, 218, 255, 0.5);
+            font-size: 0.8rem;
+            margin-top: 0.1rem;
+        }
+
+        .modal-release .release-actions {
+            display: flex;
+            gap: 0.3rem;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .modal-release .release-actions button {
+            background: rgba(255, 255, 255, 0.04);
+            border: none;
+            color: #b0caf0;
+            padding: 0.2rem 0.6rem;
+            border-radius: 0.4rem;
+            font-size: 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-release .release-actions button:hover {
+            background: rgba(70, 140, 255, 0.15);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(18, 30, 50, 0.92);
+            backdrop-filter: blur(8px);
+            padding: 0.6rem 1rem;
+            border-radius: 0.8rem;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+            z-index: 2000;
+            animation: toastIn 0.3s ease;
+            display: none;
+            font-size: 0.85rem;
+        }
+
+        .toast.show {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        @keyframes toastIn {
+            0% {
+                opacity: 0;
+                transform: translateY(10px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .toast i {
+            color: #5bb8ff;
+        }
+
+        .modal-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .modal-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.01);
+        }
+        .modal-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 2px;
+        }
+
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+            gap: 1rem;
+        }
+
+        .loading-spinner .spinner-ring {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid rgba(138, 180, 255, 0.1);
+            border-top: 3px solid #8ab4ff;
+            animation: spinnerRotate 0.8s linear infinite;
+        }
+
+        @keyframes spinnerRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-spinner span {
+            color: rgba(200, 218, 255, 0.3);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 680px) {
+            .glass-card {
+                padding: 1.2rem 0.8rem;
+                border-radius: 1.8rem;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.6rem;
+            }
+            .avatar-wrapper {
+                width: 100%;
+            }
+            .badge-github {
+                margin-left: 0;
+                width: 100%;
+                justify-content: center;
+                font-size: 0.7rem;
+            }
+            .repo-grid {
+                gap: 0.6rem;
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                padding: 1rem;
+            }
+            .modal-stats {
+                gap: 0.6rem;
+            }
+            .slider-slide img {
+                height: 180px;
+            }
+            .modal-release {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .modal-release .release-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="particles-canvas"></canvas>
+
+    <main class="glass-card">
+        <div class="header">
+            <div class="avatar-wrapper">
+                <div class="avatar" id="avatarContainer">
+                    <i class="fas fa-user-circle fallback-icon"></i>
+                </div>
+                <div class="brand-wrapper">
+                    <span class="brand">RepowerStudio</span>
+                    <span class="brand-sub">github.com/repowerstudio</span>
+                </div>
+            </div>
+            <div class="badge-github" id="refreshBadge">
+                <i class="fab fa-github"></i>
+                <span>Обновить</span>
+                <i class="fas fa-sync-alt" style="font-size:0.55rem;opacity:0.4;"></i>
+            </div>
+        </div>
+
+        <div class="tagline">
+            <i class="fas fa-code" style="color:rgba(120,180,255,0.3);"></i>
+            Инструменты для разработчиков · Open Source
+            <span class="loader-small" id="loaderIndicator">
+                <span class="loader-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+                загрузка
+            </span>
+        </div>
+
+        <div class="repo-grid" id="repoGrid">
+            <div style="grid-column:1/-1;text-align:center;color:rgba(200,218,255,0.2);padding:1.5rem 0;font-size:0.9rem;">
+                <div class="loading-spinner">
+                    <div class="spinner-ring"></div>
+                    <span>Загрузка репозиториев...</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex;justify-content:center;gap:0.8rem;flex-wrap:wrap;">
+            <a href="https://github.com/repowerstudio" target="_blank" class="btn-primary" id="exploreBtn">
+                <i class="fab fa-github"></i> Перейти в GitHub
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="footer-links">
+            <div class="live-indicator">
+                <span class="pulse-circle"></span>
+                <span id="repoCountStatus">репозитории: 0</span>
+            </div>
+            <div class="social-icons">
+                <a href="https://github.com/repowerstudio" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-discord"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+            <div class="footer-copy">
+                <i class="fas fa-code"></i> 2026 · RepowerStudio
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content" id="modalContent">
+            <button class="modal-close" id="modalClose">✕</button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Скопировано!</span>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // --- Частицы ---
+            const canvas = document.getElementById('particles-canvas');
+            const ctx = canvas.getContext('2d');
+            let w, h;
+            let particles = [];
+            const COUNT = 40;
+
+            function resize() {
+                w = window.innerWidth;
+                h = window.innerHeight;
+                canvas.width = w;
+                canvas.height = h;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+                reset() {
+                    this.x = Math.random() * w;
+                    this.y = Math.random() * h;
+                    this.r = Math.random() * 1.5 + 0.5;
+                    this.sx = (Math.random() - 0.5) * 0.2;
+                    this.sy = (Math.random() - 0.5) * 0.2;
+                    this.o = Math.random() * 0.3 + 0.1;
+                }
+                update() {
+                    this.x += this.sx;
+                    this.y += this.sy;
+                    if (this.x < 0 || this.x > w) this.sx *= -1;
+                    if (this.y < 0 || this.y > h) this.sy *= -1;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(180,215,255,${this.o})`;
+                    ctx.shadowColor = 'rgba(100,180,255,0.08)';
+                    ctx.shadowBlur = 4;
+                    ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < COUNT; i++) particles.push(new Particle());
+
+            function drawLines() {
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const d = Math.sqrt(dx * dx + dy * dy);
+                        if (d < 80) {
+                            const o = (1 - d / 80) * 0.08;
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(140,190,255,${o})`;
+                            ctx.lineWidth = 0.4;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, w, h);
+                particles.forEach(p => { p.update();
+                    p.draw(); });
+                drawLines();
+                requestAnimationFrame(animate);
+            }
+            animate();
+
+            // --- Toast ---
+            function showToast(msg, icon = 'fa-check-circle') {
+                const t = document.getElementById('toast');
+                document.getElementById('toastMessage').textContent = msg;
+                t.querySelector('i').className = `fas ${icon}`;
+                t.classList.add('show');
+                clearTimeout(t._t);
+                t._t = setTimeout(() => t.classList.remove('show'), 2000);
+            }
+
+            // --- Копирование и скачивание ---
+            async function copyText(text) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    showToast('Скопировано!');
+                } catch {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    showToast('Скопировано!');
+                }
+            }
+
+            function downloadFile(url, name) {
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToast('Скачивание начато!', 'fa-download');
+            }
+
+            // --- Загрузка аватара ---
+            async function loadAvatar() {
+                const container = document.getElementById('avatarContainer');
+                try {
+                    const res = await fetch(`https://api.github.com/users/repowerstudio`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.avatar_url) {
+                            container.innerHTML = `<img src="${data.avatar_url}" alt="RepowerStudio" />`;
+                        }
+                    }
+                } catch (e) {}
+            }
+            loadAvatar();
+
+            // --- DOM ---
+            const grid = document.getElementById('repoGrid');
+            const loader = document.getElementById('loaderIndicator');
+            const countStatus = document.getElementById('repoCountStatus');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalBody = document.getElementById('modalBody');
+            const modalClose = document.getElementById('modalClose');
+            const refreshBadge = document.getElementById('refreshBadge');
+
+            const USERNAME = 'repowerstudio';
+
+            function esc(html) {
+                const d = document.createElement('div');
+                d.textContent = html;
+                return d.innerHTML;
+            }
+
+            // --- Создание карточки ---
+            function createCard(repo) {
+                const card = document.createElement('div');
+                card.className = 'repo-card';
+
+                let icon = 'fa-code';
+                if (repo.language) {
+                    const l = repo.language.toLowerCase();
+                    if (l.includes('javascript') || l.includes('js')) icon = 'fab fa-js';
+                    else if (l.includes('typescript') || l.includes('ts')) icon = 'fab fa-js-square';
+                    else if (l.includes('python')) icon = 'fab fa-python';
+                    else if (l.includes('html')) icon = 'fab fa-html5';
+                    else if (l.includes('css')) icon = 'fab fa-css3';
+                    else if (l.includes('rust')) icon = 'fab fa-rust';
+                    else if (l.includes('go')) icon = 'fab fa-golang';
+                    else if (l.includes('java')) icon = 'fab fa-java';
+                    else if (l.includes('php')) icon = 'fab fa-php';
+                }
+
+                card.innerHTML = `
+                    <span class="repo-icon"><i class="${icon}"></i></span>
+                    <h3>${esc(repo.name)}</h3>
+                    <div class="repo-desc">${esc(repo.description || 'Нет описания')}</div>
+                    <div class="repo-stats">
+                        <span><i class="fas fa-star"></i> ${repo.stargazers_count || 0}</span>
+                        <span><i class="fas fa-code-branch"></i> ${repo.forks_count || 0}</span>
+                        ${repo.language ? `<span><i class="fas fa-circle" style="color:#7aafff;font-size:0.4rem;"></i> ${esc(repo.language)}</span>` : ''}
+                    </div>
+                `;
+
+                card.addEventListener('click', () => openModal(repo));
+                return card;
+            }
+
+            // --- Загрузка репозиториев ---
+            async function fetchRepos() {
+                try {
+                    const res = await fetch(`https://api.github.com/users/${USERNAME}/repos?sort=updated&per_page=15`);
+                    if (!res.ok) throw new Error(`Ошибка ${res.status}`);
+                    const data = await res.json();
+                    if (!data.length) throw new Error('Репозитории не найдены');
+
+                    grid.innerHTML = '';
+                    data.sort((a, b) => b.stargazers_count - a.stargazers_count);
+                    data.forEach(r => grid.appendChild(createCard(r)));
+
+                    countStatus.textContent = `репозитории: ${data.length}`;
+                    loader.innerHTML = `
+                        <span style="color:#5bb8ff;">●</span>
+                        ${data.length} загружено
+                    `;
+                } catch (err) {
+                    grid.innerHTML = `
+                        <div style="grid-column:1/-1;text-align:center;color:rgba(200,180,200,0.3);padding:1.5rem 0;font-size:0.9rem;">
+                            <i class="fas fa-exclamation-triangle" style="font-size:1.8rem;display:block;margin-bottom:0.4rem;"></i>
+                            ${esc(err.message)}
+                        </div>
+                    `;
+                    loader.innerHTML = `<span style="color:#ff8a8a;">●</span> ошибка`;
+                    countStatus.textContent = 'репозитории: —';
+                }
+            }
+
+            // --- Слайдер ---
+            let sliderInstances = [];
+
+            function initSlider(container, images) {
+                if (!container || !images.length) return;
+
+                const track = container.querySelector('.slider-track');
+                const dots = container.querySelector('.slider-dots');
+                let current = 0;
+                const total = images.length;
+
+                function updateSlider(index) {
+                    current = index;
+                    track.style.transform = `translateX(-${current * 100}%)`;
+                    dots.querySelectorAll('button').forEach((btn, i) => {
+                        btn.classList.toggle('active', i === current);
+                    });
+                }
+
+                // Создаем слайды
+                images.forEach((img, i) => {
+                    const slide = document.createElement('div');
+                    slide.className = 'slider-slide';
+                    slide.innerHTML = `
+                        <img src="${img.download_url}" alt="${esc(img.name)}" loading="lazy" />
+                        <div class="slide-name">${esc(img.name)}</div>
+                        <div style="display:flex;justify-content:center;gap:0.3rem;margin-top:0.3rem;">
+                            <button class="copy-img-btn" data-url="${img.download_url}" style="background:rgba(255,255,255,0.06);border:none;color:#b0caf0;padding:0.15rem 0.5rem;border-radius:0.3rem;font-size:0.6rem;cursor:pointer;">📋 Копировать</button>
+                            <button class="download-img-btn" data-url="${img.download_url}" data-name="${esc(img.name)}" style="background:rgba(255,255,255,0.06);border:none;color:#b0caf0;padding:0.15rem 0.5rem;border-radius:0.3rem;font-size:0.6rem;cursor:pointer;">⬇ Скачать</button>
+                        </div>
+                    `;
+                    track.appendChild(slide);
+                });
+
+                // Точки
+                for (let i = 0; i < total; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = i === 0 ? 'active' : '';
+                    btn.addEventListener('click', () => updateSlider(i));
+                    dots.appendChild(btn);
+                }
+
+                // Кнопки навигации
+                const prevBtn = container.querySelector('.slider-btn.prev');
+                const nextBtn = container.querySelector('.slider-btn.next');
+
+                prevBtn.addEventListener('click', () => {
+                    updateSlider(current > 0 ? current - 1 : total - 1);
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    updateSlider(current < total - 1 ? current + 1 : 0);
+                });
+
+                // Клавиши
+                container._keyHandler = (e) => {
+                    if (e.key === 'ArrowLeft') prevBtn.click();
+                    if (e.key === 'ArrowRight') nextBtn.click();
+                };
+                document.addEventListener('keydown', container._keyHandler);
+
+                sliderInstances.push(container);
+            }
+
+            // --- Открытие модального окна ---
+            async function openModal(repo) {
+                modalOverlay.classList.add('active');
+                modalBody.innerHTML = `
+                    <div class="loading-spinner">
+                        <div class="spinner-ring"></div>
+                        <span>Загрузка данных...</span>
+                    </div>
+                `;
+
+                try {
+                    const [contentsRes, releasesRes] = await Promise.all([
+                        fetch(`https://api.github.com/repos/${USERNAME}/${repo.name}/contents`),
+                        fetch(`https://api.github.com/repos/${USERNAME}/${repo.name}/releases?per_page=10`)
+                    ]);
+
+                    let files = [];
+                    let releases = [];
+                    if (contentsRes.ok) files = await contentsRes.json();
+                    if (releasesRes.ok) releases = await releasesRes.json();
+
+                    const images = [];
+                    const otherFiles = [];
+                    if (Array.isArray(files)) {
+                        files.forEach(f => {
+                            const ext = f.name.split('.').pop().toLowerCase();
+                            if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp', 'ico'].includes(ext)) {
+                                images.push(f);
+                            } else {
+                                otherFiles.push(f);
+                            }
+                        });
+                    }
+
+                    let html = `
+                        <h2 class="modal-title"><i class="fas fa-folder-open" style="color:#8ab4ff;margin-right:0.5rem;"></i>${esc(repo.name)}</h2>
+                        <p class="modal-desc">${esc(repo.description || 'Нет описания')}</p>
+                        <div class="modal-stats">
+                            <span class="modal-stat"><i class="fas fa-star"></i> ${repo.stargazers_count || 0}</span>
+                            <span class="modal-stat"><i class="fas fa-code-branch"></i> ${repo.forks_count || 0}</span>
+                            ${repo.language ? `<span class="modal-stat"><i class="fas fa-circle" style="color:#7aafff;"></i> ${esc(repo.language)}</span>` : ''}
+                            <span class="modal-stat"><i class="fas fa-calendar-alt"></i> ${new Date(repo.updated_at).toLocaleDateString()}</span>
+                        </div>
+                    `;
+
+                    // Слайдер изображений
+                    if (images.length > 0) {
+                        html += `
+                            <div class="modal-section">
+                                <h4><i class="fas fa-images"></i> Изображения (${images.length})</h4>
+                                <div class="slider-container">
+                                    <button class="slider-btn prev"><i class="fas fa-chevron-left"></i></button>
+                                    <div class="slider-track"></div>
+                                    <button class="slider-btn next"><i class="fas fa-chevron-right"></i></button>
+                                    <div class="slider-dots"></div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // Релизы
+                    if (releases.length > 0) {
+                        html += `
+                            <div class="modal-section">
+                                <h4><i class="fas fa-tag"></i> Релизы (${releases.length})</h4>
+                        `;
+                        releases.slice(0, 10).forEach(r => {
+                            const assets = r.assets || [];
+                            html += `
+                                <div class="modal-release">
+                                    <div class="release-info">
+                                        <span class="release-tag"><i class="fas fa-tag"></i> ${esc(r.tag_name)}</span>
+                                        <span class="release-date">${new Date(r.published_at || r.created_at).toLocaleDateString()}</span>
+                                        ${r.name ? `<div class="release-name">${esc(r.name)}</div>` : ''}
+                                    </div>
+                                    <div class="release-actions">
+                                        ${assets.slice(0, 3).map(a => `
+                                            <button class="download-release-btn" data-url="${a.browser_download_url}" data-name="${esc(a.name)}">
+                                                <i class="fas fa-download"></i> ${esc(a.name.length > 12 ? a.name.substring(0, 12)+'…' : a.name)}
+                                            </button>
+                                        `).join('')}
+                                        ${assets.length > 3 ? `<span style="font-size:0.6rem;color:rgba(200,218,255,0.2);">+${assets.length-3}</span>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += `</div>`;
+                    }
+
+                    // README
+                    const readme = files.find(f => f.name.toLowerCase() === 'readme.md');
+                    if (readme) {
+                        try {
+                            const rRes = await fetch(readme.download_url);
+                            const text = await rRes.text();
+                            html += `
+                                <div class="modal-section">
+                                    <h4><i class="fas fa-file-alt"></i> README.md</h4>
+                                    <div class="modal-code">
+                                        <div class="code-actions">
+                                            <button class="copy-btn" data-code="${encodeURIComponent(text)}"><i class="fas fa-copy"></i> Копировать</button>
+                                            <button class="download-btn" data-url="${readme.download_url}" data-name="README.md"><i class="fas fa-download"></i> Скачать</button>
+                                        </div>
+                                        <pre>${esc(text.substring(0, 1500))}${text.length > 1500 ? '\n... (обрезано)' : ''}</pre>
+                                    </div>
+                                </div>
+                            `;
+                        } catch (e) {}
+                    }
+
+                    // Файлы
+                    if (otherFiles.length > 0) {
+                        html += `
+                            <div class="modal-section">
+                                <h4><i class="fas fa-file-code"></i> Файлы (${otherFiles.length})</h4>
+                                <div class="modal-files">
+                        `;
+                        otherFiles.slice(0, 15).forEach(f => {
+                            html += `
+                                <div class="modal-file">
+                                    <span><i class="fas fa-file" style="color:#8ab4ff;"></i> ${esc(f.name)}</span>
+                                    <div class="file-actions">
+                                        <button class="copy-file-btn" data-url="${f.download_url}" title="Копировать"><i class="fas fa-copy"></i></button>
+                                        <button class="download-file-btn" data-url="${f.download_url}" data-name="${esc(f.name)}" title="Скачать"><i class="fas fa-download"></i></button>
+                                        <button class="view-file-btn" data-url="${f.download_url}" data-name="${esc(f.name)}" title="Просмотр"><i class="fas fa-eye"></i></button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += `</div></div>`;
+                    }
+
+                    if (!images.length && !otherFiles.length && !readme && !releases.length) {
+                        html += `
+                            <div style="text-align:center;color:rgba(200,218,255,0.2);padding:1rem 0;font-size:0.85rem;">
+                                <i class="fas fa-inbox" style="font-size:1.5rem;display:block;margin-bottom:0.2rem;"></i>
+                                Нет файлов для отображения
+                            </div>
+                        `;
+                    }
+
+                    modalBody.innerHTML = html;
+
+                    // --- Инициализация слайдера ---
+                    const sliderContainer = modalBody.querySelector('.slider-container');
+                    if (sliderContainer && images.length > 0) {
+                        initSlider(sliderContainer, images);
+                    }
+
+                    // --- Обработчики ---
+
+                    // Копирование кода
+                    modalBody.querySelectorAll('.copy-btn').forEach(b => {
+                        b.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            copyText(decodeURIComponent(b.dataset.code));
+                        });
+                    });
+
+                    // Скачивание файла
+                    modalBody.querySelectorAll('.download-btn').forEach(b => {
+                        b.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            downloadFile(b.dataset.url, b.dataset.name);
+                        });
+                    });
+
+                    // Скачивание релизов
+                    modalBody.querySelectorAll('.download-release-btn').forEach(b => {
+                        b.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            downloadFile(b.dataset.url, b.dataset.name);
+                        });
+                    });
+
+                    // Копирование URL изображения
+                    modalBody.querySelectorAll('.copy-img-btn').forEach(b => {
+                        b.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            copyText(b.dataset.url);
+                        });
+                    });
+
+                    // Скачивание изображения
+                    modalBody.querySelectorAll('.download-img-btn').forEach(b => {
+                        b.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            downloadFile(b.dataset.url, b.dataset.name);
+                        });
+                    });
+
+                    // Копирование файла
+                    modalBody.querySelectorAll('.copy-file-btn').forEach(b => {
+                        b.addEventListener('click', async (e) => {
+                            e.stopPropagation();
+                            try {
+                                const res = await fetch(b.dataset.url);
+                                const text = await res.text();
+                                copyText(text);
+                            } catch {
+                                showToast('Ошибка загрузки', 'fa-exclamation-circle');
+                            }
+                        });
+                    });
+
+                    // Скачивание файла
+                    modalBody.querySelectorAll('.download-file-btn').forEach(b => {
+                        b.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            downloadFile(b.dataset.url, b.dataset.name);
+                        });
+                    });
+
+                    // Просмотр файла
+                    modalBody.querySelectorAll('.view-file-btn').forEach(b => {
+                        b.addEventListener('click', async (e) => {
+                            e.stopPropagation();
+                            try {
+                                const res = await fetch(b.dataset.url);
+                                const text = await res.text();
+                                const vw = document.createElement('div');
+                                vw.style.cssText =
+                                    'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:3000;display:flex;align-items:center;justify-content:center;padding:1rem;';
+                                vw.innerHTML = `
+                                    <div style="background:rgba(18,30,50,0.96);border-radius:1.2rem;padding:1.2rem;max-width:750px;width:100%;max-height:80vh;overflow-y:auto;position:relative;">
+                                        <button style="position:sticky;top:0;float:right;background:rgba(255,255,255,0.04);border:none;color:#fff;font-size:1.3rem;width:2rem;height:2rem;border-radius:50%;cursor:pointer;">&times;</button>
+                                        <h4 style="color:#b0caf0;margin-bottom:0.6rem;font-size:1rem;">${b.dataset.name}</h4>
+                                        <pre style="background:rgba(0,0,0,0.25);border-radius:0.6rem;padding:0.6rem;color:#b0d0f0;font-family:monospace;font-size:0.75rem;white-space:pre-wrap;word-break:break-all;max-height:55vh;overflow-y:auto;">${esc(text)}</pre>
+                                    </div>
+                                `;
+                                document.body.appendChild(vw);
+                                vw.querySelector('button').addEventListener('click', () => document.body.removeChild(vw));
+                                vw.addEventListener('click', (e) => { if (e.target === vw) document.body.removeChild(vw); });
+                            } catch {
+                                showToast('Ошибка загрузки', 'fa-exclamation-circle');
+                            }
+                        });
+                    });
+
+                } catch (err) {
+                    modalBody.innerHTML = `
+                        <div style="text-align:center;color:rgba(255,150,150,0.3);padding:1.5rem 0;">
+                            <i class="fas fa-exclamation-triangle" style="font-size:1.8rem;display:block;margin-bottom:0.4rem;"></i>
+                            Ошибка загрузки
+                            <div style="font-size:0.8rem;margin-top:0.2rem;opacity:0.4;">${esc(err.message)}</div>
+                        </div>
+                    `;
+                }
+            }
+
+            // --- Закрытие модального ---
+            modalClose.addEventListener('click', () => {
+                sliderInstances.forEach(s => {
+                    if (s._keyHandler) document.removeEventListener('keydown', s._keyHandler);
+                });
+                sliderInstances = [];
+                modalOverlay.classList.remove('active');
+            });
+
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    sliderInstances.forEach(s => {
+                        if (s._keyHandler) document.removeEventListener('keydown', s._keyHandler);
+                    });
+                    sliderInstances = [];
+                    modalOverlay.classList.remove('active');
+                }
+            });
+
+            // --- Обновление ---
+            refreshBadge.addEventListener('click', () => {
+                const icon = refreshBadge.querySelector('.fa-sync-alt');
+                icon.classList.add('fa-spin');
+                fetchRepos().then(() => {
+                    setTimeout(() => {
+                        icon.classList.remove('fa-spin');
+                        showToast('Обновлено!', 'fa-sync-alt');
+                    }, 300);
+                }).catch(() => icon.classList.remove('fa-spin'));
+            });
+
+            // --- Старт ---
+            fetchRepos();
+
+            document.getElementById('exploreBtn').addEventListener('click', function(e) {
+                const orig = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Загрузка...';
+                setTimeout(() => {
+                    this.innerHTML = orig;
+                }, 500);
+            });
+
+            console.log('✅ RepowerStudio · финальная версия со слайдером');
+        })();
+    </script>
+</body>
+</html>
