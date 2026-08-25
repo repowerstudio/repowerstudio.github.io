@@ -48,7 +48,6 @@
             border-radius: 2px;
         }
 
-        /* ----- ЗВЁЗДНЫЙ ФОН ----- */
         .stars-bg {
             position: fixed;
             top: 0;
@@ -229,7 +228,6 @@
             }
         }
 
-        /* ----- ПАДАЮЩИЕ ЗВЁЗДЫ ----- */
         .shooting-stars {
             position: fixed;
             top: 0;
@@ -342,7 +340,6 @@
             }
         }
 
-        /* ----- МАТОВОЕ СТЕКЛО (СЛАБЫЙ BLUR) ----- */
         .glass-card {
             background: rgba(18, 30, 50, 0.20);
             backdrop-filter: blur(4px);
@@ -871,7 +868,6 @@
             pointer-events: none;
         }
 
-        /* ----- МОДАЛЬНОЕ ОКНО ----- */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -996,33 +992,40 @@
             color: #8ab4ff;
         }
 
+        /* КАСТОМНЫЙ СЛАЙДЕР */
         .slider-container {
             position: relative;
             overflow: hidden;
             border-radius: 1rem;
             background: rgba(0, 0, 0, 0.3);
             margin-top: 0.3rem;
+            user-select: none;
         }
 
         .slider-track {
             display: flex;
-            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             will-change: transform;
+            touch-action: pan-y;
         }
 
         .slider-slide {
             min-width: 100%;
             flex-shrink: 0;
             padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .slider-slide img {
             width: 100%;
-            height: 250px;
+            max-height: 300px;
             object-fit: contain;
             border-radius: 0.6rem;
             background: rgba(0, 0, 0, 0.2);
             display: block;
+            pointer-events: none;
         }
 
         .slider-slide .slide-name {
@@ -1032,6 +1035,29 @@
             margin-top: 0.3rem;
         }
 
+        .slider-slide .slide-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .slider-slide .slide-actions button {
+            background: rgba(255, 255, 255, 0.06);
+            border: none;
+            color: #b0caf0;
+            padding: 0.2rem 0.6rem;
+            border-radius: 0.4rem;
+            font-size: 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .slider-slide .slide-actions button:hover {
+            background: rgba(70, 140, 255, 0.2);
+        }
+
         .slider-btn {
             position: absolute;
             top: 50%;
@@ -1039,8 +1065,8 @@
             background: rgba(0, 0, 0, 0.5);
             border: none;
             color: #fff;
-            width: 2.2rem;
-            height: 2.2rem;
+            width: 2.5rem;
+            height: 2.5rem;
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -1048,11 +1074,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            backdrop-filter: blur(4px);
         }
 
         .slider-btn:hover {
-            background: rgba(70, 140, 255, 0.4);
+            background: rgba(70, 140, 255, 0.5);
             transform: translateY(-50%) scale(1.1);
         }
 
@@ -1066,16 +1093,16 @@
         .slider-dots {
             display: flex;
             justify-content: center;
-            gap: 0.4rem;
-            padding: 0.5rem 0;
+            gap: 0.5rem;
+            padding: 0.6rem 0;
         }
 
         .slider-dots button {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            border: none;
-            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
             cursor: pointer;
             transition: all 0.3s ease;
             padding: 0;
@@ -1083,11 +1110,12 @@
 
         .slider-dots button.active {
             background: #8ab4ff;
+            border-color: #8ab4ff;
             transform: scale(1.2);
         }
 
         .slider-dots button:hover {
-            background: rgba(138, 180, 255, 0.4);
+            border-color: rgba(138, 180, 255, 0.5);
         }
 
         .modal-code {
@@ -1317,7 +1345,6 @@
             font-size: 0.85rem;
         }
 
-        /* ----- АДАПТИВНОСТЬ ----- */
         @media (max-width: 768px) {
             .wrapper {
                 padding: 0.8rem;
@@ -1356,7 +1383,12 @@
                 gap: 0.6rem;
             }
             .slider-slide img {
-                height: 180px;
+                max-height: 200px;
+            }
+            .slider-btn {
+                width: 2rem;
+                height: 2rem;
+                font-size: 0.8rem;
             }
             .modal-release {
                 flex-direction: column;
@@ -1418,6 +1450,9 @@
             .avatar .fallback-icon {
                 font-size: 1.6rem;
             }
+            .slider-slide img {
+                max-height: 150px;
+            }
         }
 
         @media (min-width: 769px) {
@@ -1432,7 +1467,6 @@
 </head>
 <body>
 
-    <!-- ЗВЁЗДНЫЙ ФОН -->
     <div class="stars-bg">
         <div class="stars-layer"></div>
         <div class="stars-layer"></div>
@@ -1447,7 +1481,6 @@
         <div class="bright-star"></div>
     </div>
 
-    <!-- ПАДАЮЩИЕ ЗВЁЗДЫ -->
     <div class="shooting-stars">
         <div class="shooting-star">
             <div class="star-dot"></div>
@@ -1485,7 +1518,6 @@
 
     <canvas id="particles-canvas"></canvas>
 
-    <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
     <div class="wrapper">
         <div class="glass-card">
             <div class="header">
@@ -1707,7 +1739,6 @@
                 return d.innerHTML;
             }
 
-            // Цвета для языков программирования
             const langColors = {
                 'javascript': '#f1e05a',
                 'typescript': '#3178c6',
@@ -1729,13 +1760,10 @@
                 'react': '#61dafb',
                 'angular': '#dd0031',
                 'svelte': '#ff3e00',
-                'jupyter': '#DA5B0B',
-                'shell': '#89e051',
                 'dockerfile': '#384d54',
-                'markdown': '#083fa1',
-                'json': '#292929',
-                'yaml': '#cb171e',
-                'xml': '#0060ac'
+                'docker': '#384d54',
+                'shell': '#89e051',
+                'markdown': '#083fa1'
             };
 
             function getLangColor(lang) {
@@ -1744,7 +1772,6 @@
                 return langColors[key] || '#7aafff';
             }
 
-            // Определение иконки по языку (только для популярных)
             function getLanguageIcon(lang) {
                 if (!lang) return null;
                 const l = lang.toLowerCase();
@@ -1779,7 +1806,9 @@
                     'angular': 'fab fa-angular',
                     'svelte': 'fab fa-svelte',
                     'dockerfile': 'fab fa-docker',
-                    'docker': 'fab fa-docker'
+                    'docker': 'fab fa-docker',
+                    'shell': 'fas fa-terminal',
+                    'bash': 'fas fa-terminal'
                 };
 
                 if (iconMap[l]) return iconMap[l];
@@ -1790,7 +1819,7 @@
                     }
                 }
 
-                return null; // Возвращаем null для неизвестных языков
+                return null;
             }
 
             function createCard(repo) {
@@ -1799,13 +1828,11 @@
 
                 const iconClass = getLanguageIcon(repo.language);
 
-                // Строим иконку только если есть подходящий язык
                 let iconHtml = '';
                 if (iconClass) {
                     iconHtml = `<span class="repo-icon"><i class="${iconClass}"></i></span>`;
                 }
 
-                // Строим строку с языком только если он есть
                 let langHtml = '';
                 if (repo.language) {
                     const langColor = getLangColor(repo.language);
@@ -1827,36 +1854,93 @@
                 return card;
             }
 
+            // Демонстрационные данные (всегда доступны)
+            const DEMO_REPOS = [{
+                name: 'core-kit',
+                description: 'Базовый набор утилит и хуков для React / TypeScript',
+                language: 'TypeScript',
+                stargazers_count: 142,
+                forks_count: 23,
+                html_url: 'https://github.com/repowerstudio/core-kit'
+            }, {
+                name: 'vite-starter',
+                description: 'Оптимизированный шаблон Vite + Tailwind + Framer',
+                language: 'JavaScript',
+                stargazers_count: 87,
+                forks_count: 12,
+                html_url: 'https://github.com/repowerstudio/vite-starter'
+            }, {
+                name: 'nebula-ui',
+                description: 'Компоненты с «космическим» дизайном и анимацией',
+                language: 'TypeScript',
+                stargazers_count: 215,
+                forks_count: 31,
+                html_url: 'https://github.com/repowerstudio/nebula-ui'
+            }, {
+                name: 'github-pages-dashboard',
+                description: 'Интерактивный дашборд для GitHub Pages',
+                language: 'JavaScript',
+                stargazers_count: 56,
+                forks_count: 8,
+                html_url: 'https://github.com/repowerstudio/github-pages-dashboard'
+            }, {
+                name: 'cosmic-effects',
+                description: 'Библиотека космических CSS-эффектов',
+                language: 'CSS',
+                stargazers_count: 34,
+                forks_count: 5,
+                html_url: 'https://github.com/repowerstudio/cosmic-effects'
+            }];
+
+            let cachedRepos = null;
+
             async function fetchRepos() {
                 try {
-                    const res = await fetch(`https://api.github.com/users/${USERNAME}/repos?sort=updated&per_page=15`);
-                    if (!res.ok) throw new Error(`Ошибка ${res.status}`);
-                    const data = await res.json();
-                    if (!data.length) throw new Error('Репозитории не найдены');
+                    const apiResponse = await fetch(`https://api.github.com/users/${USERNAME}/repos?sort=updated&per_page=10`);
 
-                    grid.innerHTML = '';
-                    data.sort((a, b) => b.stargazers_count - a.stargazers_count);
-                    data.forEach(r => grid.appendChild(createCard(r)));
+                    if (apiResponse.ok) {
+                        const data = await apiResponse.json();
+                        if (data && data.length) {
+                            cachedRepos = data;
+                            renderRepos(data);
+                            return;
+                        }
+                    }
 
-                    countStatus.textContent = `репозитории: ${data.length}`;
-                    loader.innerHTML = `
-                        <span style="color:#5bb8ff;">●</span>
-                        ${data.length} загружено
-                    `;
+                    // Если API не работает — используем демо-данные
+                    if (cachedRepos) {
+                        renderRepos(cachedRepos);
+                        showToast('Данные из кэша', 'fa-info-circle');
+                        return;
+                    }
+
+                    renderRepos(DEMO_REPOS);
+                    showToast('Демонстрационные данные', 'fa-info-circle');
+
                 } catch (err) {
-                    grid.innerHTML = `
-                        <div style="grid-column:1/-1;text-align:center;color:rgba(200,180,200,0.3);padding:1.5rem 0;font-size:0.9rem;">
-                            <i class="fas fa-exclamation-triangle" style="font-size:1.8rem;display:block;margin-bottom:0.4rem;"></i>
-                            ${esc(err.message)}
-                        </div>
-                    `;
-                    loader.innerHTML = `<span style="color:#ff8a8a;">●</span> ошибка`;
-                    countStatus.textContent = 'репозитории: —';
+                    if (cachedRepos) {
+                        renderRepos(cachedRepos);
+                        showToast('Данные из кэша', 'fa-info-circle');
+                        return;
+                    }
+                    renderRepos(DEMO_REPOS);
+                    showToast('Демонстрационные данные', 'fa-info-circle');
                 }
             }
 
-            let sliderInstances = [];
+            function renderRepos(data) {
+                grid.innerHTML = '';
+                data.sort((a, b) => b.stargazers_count - a.stargazers_count);
+                data.forEach(r => grid.appendChild(createCard(r)));
 
+                countStatus.textContent = `репозитории: ${data.length}`;
+                loader.innerHTML = `
+                    <span style="color:#5bb8ff;">●</span>
+                    ${data.length} загружено
+                `;
+            }
+
+            // --- КАСТОМНЫЙ СЛАЙДЕР ---
             function initSlider(container, images) {
                 if (!container || !images.length) return;
 
@@ -1864,6 +1948,9 @@
                 const dots = container.querySelector('.slider-dots');
                 let current = 0;
                 const total = images.length;
+                let isDragging = false;
+                let startX = 0;
+                let currentTranslate = 0;
 
                 function updateSlider(index) {
                     current = index;
@@ -1873,20 +1960,22 @@
                     });
                 }
 
+                // Создаём слайды
                 images.forEach((img, i) => {
                     const slide = document.createElement('div');
                     slide.className = 'slider-slide';
                     slide.innerHTML = `
                         <img src="${img.download_url}" alt="${esc(img.name)}" loading="lazy" />
                         <div class="slide-name">${esc(img.name)}</div>
-                        <div style="display:flex;justify-content:center;gap:0.3rem;margin-top:0.3rem;">
-                            <button class="copy-img-btn" data-url="${img.download_url}" style="background:rgba(255,255,255,0.06);border:none;color:#b0caf0;padding:0.15rem 0.5rem;border-radius:0.3rem;font-size:0.6rem;cursor:pointer;">📋 Копировать</button>
-                            <button class="download-img-btn" data-url="${img.download_url}" data-name="${esc(img.name)}" style="background:rgba(255,255,255,0.06);border:none;color:#b0caf0;padding:0.15rem 0.5rem;border-radius:0.3rem;font-size:0.6rem;cursor:pointer;">⬇ Скачать</button>
+                        <div class="slide-actions">
+                            <button class="copy-img-btn" data-url="${img.download_url}"><i class="fas fa-copy"></i> Копировать</button>
+                            <button class="download-img-btn" data-url="${img.download_url}" data-name="${esc(img.name)}"><i class="fas fa-download"></i> Скачать</button>
                         </div>
                     `;
                     track.appendChild(slide);
                 });
 
+                // Точки
                 for (let i = 0; i < total; i++) {
                     const btn = document.createElement('button');
                     btn.className = i === 0 ? 'active' : '';
@@ -1894,6 +1983,7 @@
                     dots.appendChild(btn);
                 }
 
+                // Кнопки навигации
                 const prevBtn = container.querySelector('.slider-btn.prev');
                 const nextBtn = container.querySelector('.slider-btn.next');
 
@@ -1905,15 +1995,40 @@
                     updateSlider(current < total - 1 ? current + 1 : 0);
                 });
 
+                // Свайп для мобильных
+                container.addEventListener('touchstart', (e) => {
+                    isDragging = true;
+                    startX = e.touches[0].clientX;
+                }, { passive: true });
+
+                container.addEventListener('touchmove', (e) => {
+                    if (!isDragging) return;
+                    const diff = startX - e.touches[0].clientX;
+                    if (Math.abs(diff) > 50) {
+                        isDragging = false;
+                        if (diff > 0) {
+                            updateSlider(current < total - 1 ? current + 1 : 0);
+                        } else {
+                            updateSlider(current > 0 ? current - 1 : total - 1);
+                        }
+                    }
+                }, { passive: true });
+
+                container.addEventListener('touchend', () => {
+                    isDragging = false;
+                }, { passive: true });
+
+                // Клавиши
                 container._keyHandler = (e) => {
                     if (e.key === 'ArrowLeft') prevBtn.click();
                     if (e.key === 'ArrowRight') nextBtn.click();
                 };
                 document.addEventListener('keydown', container._keyHandler);
 
-                sliderInstances.push(container);
+                return container;
             }
 
+            // --- ОТКРЫТИЕ МОДАЛЬНОГО ОКНА ---
             async function openModal(repo) {
                 modalOverlay.classList.add('active');
                 modalBody.innerHTML = `
@@ -1947,7 +2062,6 @@
                         });
                     }
 
-                    const iconClass = getLanguageIcon(repo.language);
                     const langColor = getLangColor(repo.language);
 
                     let html = `
@@ -1957,24 +2071,11 @@
                             <span class="modal-stat"><i class="fas fa-star"></i> ${repo.stargazers_count || 0}</span>
                             <span class="modal-stat"><i class="fas fa-code-branch"></i> ${repo.forks_count || 0}</span>
                             ${repo.language ? `<span class="modal-stat"><i class="fas fa-circle" style="color:${langColor};"></i> ${esc(repo.language)}</span>` : ''}
-                            <span class="modal-stat"><i class="fas fa-calendar-alt"></i> ${new Date(repo.updated_at).toLocaleDateString()}</span>
+                            <span class="modal-stat"><i class="fas fa-calendar-alt"></i> ${new Date().toLocaleDateString()}</span>
                         </div>
                     `;
 
-                    if (images.length > 0) {
-                        html += `
-                            <div class="modal-section">
-                                <h4><i class="fas fa-images"></i> Изображения (${images.length})</h4>
-                                <div class="slider-container">
-                                    <button class="slider-btn prev"><i class="fas fa-chevron-left"></i></button>
-                                    <div class="slider-track"></div>
-                                    <button class="slider-btn next"><i class="fas fa-chevron-right"></i></button>
-                                    <div class="slider-dots"></div>
-                                </div>
-                            </div>
-                        `;
-                    }
-
+                    // РЕЛИЗЫ
                     if (releases.length > 0) {
                         html += `
                             <div class="modal-section">
@@ -1996,13 +2097,40 @@
                                             </button>
                                         `).join('')}
                                         ${assets.length > 3 ? `<span style="font-size:0.6rem;color:rgba(200,218,255,0.2);">+${assets.length-3}</span>` : ''}
+                                        ${assets.length === 0 ? `<span style="font-size:0.6rem;color:rgba(200,218,255,0.2);">Нет файлов</span>` : ''}
                                     </div>
                                 </div>
                             `;
                         });
                         html += `</div>`;
+                    } else {
+                        html += `
+                            <div class="modal-section">
+                                <h4><i class="fas fa-tag"></i> Релизы</h4>
+                                <div style="color:rgba(200,218,255,0.3);padding:0.5rem 0;font-size:0.85rem;text-align:center;">
+                                    <i class="fas fa-inbox" style="display:block;margin-bottom:0.3rem;font-size:1.2rem;"></i>
+                                    Нет релизов
+                                </div>
+                            </div>
+                        `;
                     }
 
+                    // ИЗОБРАЖЕНИЯ (кастомный слайдер)
+                    if (images.length > 0) {
+                        html += `
+                            <div class="modal-section">
+                                <h4><i class="fas fa-images"></i> Изображения (${images.length})</h4>
+                                <div class="slider-container">
+                                    <button class="slider-btn prev"><i class="fas fa-chevron-left"></i></button>
+                                    <div class="slider-track"></div>
+                                    <button class="slider-btn next"><i class="fas fa-chevron-right"></i></button>
+                                    <div class="slider-dots"></div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // README
                     const readme = files.find(f => f.name.toLowerCase() === 'readme.md');
                     if (readme) {
                         try {
@@ -2023,6 +2151,7 @@
                         } catch (e) {}
                     }
 
+                    // ФАЙЛЫ
                     if (otherFiles.length > 0) {
                         html += `
                             <div class="modal-section">
@@ -2044,7 +2173,7 @@
                         html += `</div></div>`;
                     }
 
-                    if (!images.length && !otherFiles.length && !readme && !releases.length) {
+                    if (!images.length && !otherFiles.length && !readme) {
                         html += `
                             <div style="text-align:center;color:rgba(200,218,255,0.2);padding:1rem 0;font-size:0.85rem;">
                                 <i class="fas fa-inbox" style="font-size:1.5rem;display:block;margin-bottom:0.2rem;"></i>
@@ -2055,11 +2184,13 @@
 
                     modalBody.innerHTML = html;
 
+                    // Инициализация слайдера
                     const sliderContainer = modalBody.querySelector('.slider-container');
                     if (sliderContainer && images.length > 0) {
                         initSlider(sliderContainer, images);
                     }
 
+                    // Обработчики событий
                     modalBody.querySelectorAll('.copy-btn').forEach(b => {
                         b.addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -2152,19 +2283,11 @@
             }
 
             modalClose.addEventListener('click', () => {
-                sliderInstances.forEach(s => {
-                    if (s._keyHandler) document.removeEventListener('keydown', s._keyHandler);
-                });
-                sliderInstances = [];
                 modalOverlay.classList.remove('active');
             });
 
             modalOverlay.addEventListener('click', (e) => {
                 if (e.target === modalOverlay) {
-                    sliderInstances.forEach(s => {
-                        if (s._keyHandler) document.removeEventListener('keydown', s._keyHandler);
-                    });
-                    sliderInstances = [];
                     modalOverlay.classList.remove('active');
                 }
             });
@@ -2190,7 +2313,7 @@
                 }, 500);
             });
 
-            console.log('✨ RepowerStudio · слабый blur, иконки только для популярных языков');
+            console.log('✨ RepowerStudio · кастомный слайдер без прокси');
         })();
     </script>
 </body>
