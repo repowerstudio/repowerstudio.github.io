@@ -103,9 +103,9 @@
 <body>
 
     <section class="hero">
-        <h1>Скачай.<br><span>Установи.</span></h1>
+        <h1>Tlauncher<br><span>Installer.</span></h1>
         <p>
-            Простое приложение для Windows. Один клик — и файл у вас.
+            Простое приложение для Windows. Один клик — и приложение у вас.
         </p>
 
         <button class="btn-download" id="dl-btn">
