@@ -12,90 +12,20 @@
             background: #0a0a0f;
             color: #e8e8f0;
             min-height: 100vh;
-            overflow-x: hidden;
         }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 48px;
-            background: rgba(10, 10, 15, 0.9);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid #1c1c28;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            color: #fff;
-        }
-
-        .logo span { color: #4ade80; }
-
-        nav ul {
-            display: flex;
-            gap: 32px;
-            list-style: none;
-        }
-
-        nav a {
-            color: #8888a0;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        nav a:hover { color: #4ade80; }
 
         .hero {
-            position: relative;
             text-align: center;
             padding: 120px 24px 100px;
-            background:
-                radial-gradient(ellipse at 50% 0%, rgba(74, 222, 128, 0.12), transparent 65%),
-                radial-gradient(ellipse at 80% 80%, rgba(99, 102, 241, 0.08), transparent 60%);
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(74, 222, 128, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(74, 222, 128, 0.03) 1px, transparent 1px);
-            background-size: 48px 48px;
-            pointer-events: none;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 6px 16px;
-            background: rgba(74, 222, 128, 0.1);
-            border: 1px solid rgba(74, 222, 128, 0.3);
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #4ade80;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 24px;
-            position: relative;
+            background: radial-gradient(ellipse at 50% 0%, rgba(74, 222, 128, 0.12), transparent 65%);
         }
 
         .hero h1 {
-            font-size: 64px;
+            font-size: 56px;
             font-weight: 900;
-            line-height: 1.05;
+            line-height: 1.1;
             margin-bottom: 20px;
             color: #fff;
-            position: relative;
-            letter-spacing: -1px;
         }
 
         .hero h1 span {
@@ -111,7 +41,6 @@
             max-width: 620px;
             margin: 0 auto 44px;
             line-height: 1.7;
-            position: relative;
         }
 
         .btn-download {
@@ -121,165 +50,169 @@
             padding: 20px 56px;
             background: linear-gradient(135deg, #4ade80, #22c55e);
             color: #0a0a0f;
+            border: none;
             border-radius: 14px;
             text-decoration: none;
             font-size: 18px;
             font-weight: 800;
-            letter-spacing: 0.3px;
+            cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 0 50px rgba(74, 222, 128, 0.3);
-            position: relative;
+            font-family: inherit;
         }
 
-        .btn-download:hover {
+        .btn-download:hover:not(:disabled) {
             transform: translateY(-3px);
             box-shadow: 0 0 70px rgba(74, 222, 128, 0.55);
         }
 
-        .btn-download:active { transform: translateY(-1px); }
+        .btn-download:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
 
         .btn-download svg { width: 22px; height: 22px; }
 
-        .version-info {
+        .status {
             margin-top: 20px;
-            font-size: 13px;
-            color: #55556a;
-            position: relative;
+            font-size: 14px;
+            color: #8888a0;
+            min-height: 20px;
         }
 
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
-            max-width: 1080px;
-            margin: 0 auto;
-            padding: 0 24px 80px;
-        }
-
-        .feature-card {
-            background: linear-gradient(180deg, #14141f, #10101a);
-            border: 1px solid #1c1c28;
-            border-radius: 16px;
-            padding: 32px 28px;
-            transition: border-color 0.25s, transform 0.25s;
-            position: relative;
+        .progress {
+            width: 320px;
+            height: 6px;
+            background: #1c1c28;
+            border-radius: 3px;
+            margin: 16px auto 0;
             overflow: hidden;
+            display: none;
         }
 
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #4ade80, transparent);
-            opacity: 0;
-            transition: opacity 0.25s;
-        }
+        .progress.visible { display: block; }
 
-        .feature-card:hover {
-            border-color: rgba(74, 222, 128, 0.4);
-            transform: translateY(-3px);
-        }
-
-        .feature-card:hover::before { opacity: 1; }
-
-        .feature-card .icon {
-            font-size: 32px;
-            margin-bottom: 18px;
-        }
-
-        .feature-card h3 {
-            font-size: 17px;
-            margin-bottom: 10px;
-            color: #fff;
-            font-weight: 700;
-        }
-
-        .feature-card p {
-            font-size: 14px;
-            color: #77778a;
-            line-height: 1.65;
-        }
-
-        .warning {
-            max-width: 760px;
-            margin: 0 auto 70px;
-            padding: 18px 24px;
-            background: rgba(255, 180, 0, 0.06);
-            border: 1px solid rgba(255, 180, 0, 0.22);
-            border-radius: 12px;
-            font-size: 14px;
-            color: #d4a030;
-            line-height: 1.65;
-            display: flex;
-            gap: 14px;
-            align-items: flex-start;
-        }
-
-        .warning .icon { font-size: 20px; flex-shrink: 0; }
-
-        footer {
-            text-align: center;
-            padding: 32px 24px;
-            border-top: 1px solid #1c1c28;
-            font-size: 13px;
-            color: #44445a;
-        }
-
-        footer a {
-            color: #4ade80;
-            text-decoration: none;
-        }
-
-        @media (max-width: 768px) {
-            nav { padding: 14px 20px; }
-            nav ul { display: none; }
-            .hero { padding: 70px 20px 60px; }
-            .hero h1 { font-size: 40px; }
-            .hero p { font-size: 16px; }
-            .btn-download { padding: 16px 36px; font-size: 16px; }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            transition: width 0.15s;
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">Tlauncher<span>Installer</span></div>
-    </nav>
-
     <section class="hero">
-        <div class="badge">Версия 1.0 · Windows</div>
-        <h1>Скачай.<br>Установи. <span>Пользуйся</span>.</h1>
+        <h1>Скачай.<br><span>Установи.</span></h1>
         <p>
-            Простое приложение для Windows с понятным интерфейсом.
-            Скачай одним кликом — установка не требуется.
+            Простое приложение для Windows. Один клик — и файл у вас.
         </p>
 
-        <a class="btn-download" href="Tlauncher Installer.exe" download>
+        <button class="btn-download" id="dl-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
             Скачать
-        </a>
+        </button>
 
-        <div class="version-info">Windows 10/11 · x64 · Бесплатно</div>
+        <div class="progress" id="progress">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div class="status" id="status"></div>
     </section>
 
-    <div class="warning">
-        <div class="icon">⚠️</div>
-        <div>
-            <strong>Внимание:</strong> файл предоставляется «как есть».
-            Перед запуском проверьте его антивирусом.
-        </div>
-    </div>
+    <script>
+        // ===== Настройки =====
+        // Путь к файлу. Если файл рядом с index.html — оставьте "app.exe".
+        // Если в GitHub Releases — вставьте полный URL.
+        const FILE_URL = 'Tlauncher Installer.exe';
+        const FILE_NAME = 'Tlauncher Installer.exe';
 
-    <footer>
-        © 2026 · <a href="#">GitHub</a>
-    </footer>
+        // ===== Логика =====
+        const btn = document.getElementById('dl-btn');
+        const status = document.getElementById('status');
+        const progress = document.getElementById('progress');
+        const progressBar = document.getElementById('progress-bar');
+
+        btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            status.textContent = 'Загрузка файла...';
+            progress.classList.add('visible');
+            progressBar.style.width = '0%';
+
+            try {
+                const response = await fetch(FILE_URL);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: файл не найден`);
+                }
+
+                // Если браузер поддерживает стриминг — показываем прогресс
+                const contentLength = response.headers.get('content-length');
+                const total = contentLength ? parseInt(contentLength, 10) : 0;
+
+                const reader = response.body.getReader();
+                const chunks = [];
+                let received = 0;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    chunks.push(value);
+                    received += value.length;
+
+                    if (total > 0) {
+                        const percent = Math.round((received / total) * 100);
+                        progressBar.style.width = percent + '%';
+                        status.textContent = `Загрузка: ${percent}% (${formatSize(received)} / ${formatSize(total)})`;
+                    } else {
+                        status.textContent = `Загрузка: ${formatSize(received)}`;
+                    }
+                }
+
+                // Собираем все куски в один Blob
+                const blob = new Blob(chunks);
+                const objectUrl = URL.createObjectURL(blob);
+
+                // Создаём временную ссылку и кликаем по ней
+                const a = document.createElement('a');
+                a.href = objectUrl;
+                a.download = FILE_NAME;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                // Освобождаем память
+                URL.revokeObjectURL(objectUrl);
+
+                status.textContent = '✓ Файл скачан';
+                progressBar.style.width = '100%';
+
+                setTimeout(() => {
+                    progress.classList.remove('visible');
+                }, 1500);
+
+            } catch (err) {
+                console.error(err);
+                status.textContent = '✗ Ошибка: ' + err.message;
+                progress.classList.remove('visible');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // Форматирование размера
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' Б';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' КБ';
+            if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' МБ';
+            return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' ГБ';
+        }
+    </script>
 
 </body>
 </html>
