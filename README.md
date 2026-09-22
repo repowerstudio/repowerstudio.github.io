@@ -1,415 +1,285 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#161616">
-<title>Qwen 1.5B — локальный чат</title>
-<style>
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body {
-    margin: 0; padding: 0; height: 100%; overscroll-behavior: none;
-    font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-    background: #0d0d0d; color: #e0e0e0;
-  }
-  body {
-    display: flex; flex-direction: column;
-    height: 100vh; height: 100dvh;
-    padding: env(safe-area-inset-top) env(safe-area-inset-right)
-             env(safe-area-inset-bottom) env(safe-area-inset-left);
-  }
-  header {
-    padding: 10px 14px; background: #161616; border-bottom: 1px solid #262626;
-    display: flex; justify-content: space-between; align-items: center;
-    gap: 10px; min-height: 52px;
-  }
-  header h1 { margin: 0; font-size: 15px; font-weight: 600; }
-  header button {
-    padding: 10px 16px; background: #2a6df4; color: #fff; border: 0;
-    border-radius: 10px; font: inherit; font-size: 14px; font-weight: 600;
-    cursor: pointer; min-height: 40px; white-space: nowrap;
-  }
-  header button:disabled { background: #333; color: #666; }
-  header button.ready { background: #1a8a3a; }
-  #status { font-size: 12px; color: #888; max-width: 30%; overflow: hidden; text-overflow: ellipsis; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Скачать</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  #loadingScreen {
-    display: none; flex-direction: column;
-    align-items: center; justify-content: center;
-    flex: 1; padding: 24px; gap: 20px; text-align: center;
-  }
-  #loadingScreen.active { display: flex; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0a0a0f;
+            color: #e8e8f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-  .circle-wrap { position: relative; width: 160px; height: 160px; }
-  .circle-wrap svg { transform: rotate(-90deg); }
-  .circle-bg { fill: none; stroke: #1e1e1e; stroke-width: 8; }
-  .circle-fg {
-    fill: none; stroke: #2a6df4; stroke-width: 8;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 0.3s ease;
-  }
-  .circle-inner {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-  }
-  .circle-pct { font-size: 36px; font-weight: 700; color: #fff; line-height: 1; }
-  .circle-pct span { font-size: 18px; color: #888; }
-  .circle-label {
-    font-size: 11px; color: #666; margin-top: 4px;
-    text-transform: uppercase; letter-spacing: 1px;
-  }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 48px;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #1c1c28;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-  .stage-text {
-    font-size: 14px; color: #aaa;
-    max-width: 320px; line-height: 1.4; min-height: 40px;
-  }
-  .stage-text b { color: #2a6df4; }
-  .stage-text .dim { color: #666; font-size: 12px; display: block; margin-top: 4px; }
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #fff;
+        }
 
-  .spinner {
-    width: 24px; height: 24px;
-    border: 3px solid #1e1e1e;
-    border-top-color: #2a6df4;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+        .logo span { color: #4ade80; }
 
-  .cache-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(26, 138, 58, 0.15); color: #4ade80;
-    padding: 6px 14px; border-radius: 14px;
-    font-size: 13px; font-weight: 600;
-  }
+        nav ul {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
 
-  #chat {
-    flex: 1; overflow-y: auto; padding: 12px;
-    display: none; flex-direction: column; gap: 10px;
-    -webkit-overflow-scrolling: touch;
-  }
-  #chat.active { display: flex; }
-  .msg {
-    max-width: 85%; padding: 10px 14px; border-radius: 16px;
-    word-wrap: break-word; font-size: 15px; line-height: 1.45;
-  }
-  .msg.user {
-    align-self: flex-end; background: #2a6df4; color: #fff;
-    border-bottom-right-radius: 4px; white-space: pre-wrap;
-  }
-  .msg.bot {
-    align-self: flex-start; background: #1e1e1e; color: #e0e0e0;
-    border-bottom-left-radius: 4px;
-  }
-  .msg.bot pre {
-    background: #0a0a0a; color: #d4d4d4;
-    border: 1px solid #2a2a2a; border-radius: 8px;
-    padding: 10px 12px; margin: 8px 0;
-    overflow-x: auto; -webkit-overflow-scrolling: touch;
-    font: 13px/1.5 "SF Mono", Menlo, Consolas, monospace;
-    white-space: pre;
-  }
-  .msg.bot pre code { font: inherit; color: inherit; }
-  .msg.bot code.inline {
-    background: #2a2a2a; color: #ffb86c;
-    padding: 1px 6px; border-radius: 4px;
-    font: 13px/1 "SF Mono", Menlo, Consolas, monospace;
-  }
-  .msg.bot .text { white-space: pre-wrap; }
-  .msg.bot h1, .msg.bot h2, .msg.bot h3 { margin: 8px 0 4px; color: #fff; font-size: 16px; }
-  .msg.bot ul, .msg.bot ol { margin: 6px 0; padding-left: 20px; }
-  .msg.bot strong { color: #fff; }
-  .msg.sys {
-    align-self: center; background: transparent; color: #666;
-    font-size: 12.5px; font-style: italic; text-align: center;
-    max-width: 95%;
-  }
+        nav a {
+            color: #8888a0;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
 
-  footer {
-    padding: 8px 10px; background: #161616; border-top: 1px solid #262626;
-    display: flex; gap: 8px; align-items: flex-end;
-  }
-  #input {
-    flex: 1; padding: 12px 14px; background: #1e1e1e; color: #e0e0e0;
-    border: 1px solid #333; border-radius: 20px; font: inherit; font-size: 16px;
-    resize: none; outline: none; max-height: 120px; line-height: 1.4; min-height: 44px;
-  }
-  #input:focus { border-color: #2a6df4; }
-  #input:disabled { opacity: .4; }
-  #send {
-    padding: 0 18px; background: #2a6df4; color: #fff; border: 0;
-    border-radius: 22px; font: inherit; font-size: 15px; font-weight: 600;
-    cursor: pointer; min-width: 44px; height: 44px;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
-  #send:disabled { background: #333; color: #666; }
-  @media (max-width: 380px) {
-    #send { padding: 0 14px; }
-    #send .label { display: none; }
-    #send::after { content: '➤'; font-size: 18px; }
-  }
-  #chat::-webkit-scrollbar { width: 6px; }
-  #chat::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-</style>
+        nav a:hover { color: #4ade80; }
+
+        .hero {
+            position: relative;
+            text-align: center;
+            padding: 120px 24px 100px;
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(74, 222, 128, 0.12), transparent 65%),
+                radial-gradient(ellipse at 80% 80%, rgba(99, 102, 241, 0.08), transparent 60%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(74, 222, 128, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(74, 222, 128, 0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #4ade80;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 64px;
+            font-weight: 900;
+            line-height: 1.05;
+            margin-bottom: 20px;
+            color: #fff;
+            position: relative;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #8888a0;
+            max-width: 620px;
+            margin: 0 auto 44px;
+            line-height: 1.7;
+            position: relative;
+        }
+
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            padding: 20px 56px;
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: #0a0a0f;
+            border-radius: 14px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 50px rgba(74, 222, 128, 0.3);
+            position: relative;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 70px rgba(74, 222, 128, 0.55);
+        }
+
+        .btn-download:active { transform: translateY(-1px); }
+
+        .btn-download svg { width: 22px; height: 22px; }
+
+        .version-info {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #55556a;
+            position: relative;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        .feature-card {
+            background: linear-gradient(180deg, #14141f, #10101a);
+            border: 1px solid #1c1c28;
+            border-radius: 16px;
+            padding: 32px 28px;
+            transition: border-color 0.25s, transform 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4ade80, transparent);
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(74, 222, 128, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .feature-card:hover::before { opacity: 1; }
+
+        .feature-card .icon {
+            font-size: 32px;
+            margin-bottom: 18px;
+        }
+
+        .feature-card h3 {
+            font-size: 17px;
+            margin-bottom: 10px;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #77778a;
+            line-height: 1.65;
+        }
+
+        .warning {
+            max-width: 760px;
+            margin: 0 auto 70px;
+            padding: 18px 24px;
+            background: rgba(255, 180, 0, 0.06);
+            border: 1px solid rgba(255, 180, 0, 0.22);
+            border-radius: 12px;
+            font-size: 14px;
+            color: #d4a030;
+            line-height: 1.65;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .warning .icon { font-size: 20px; flex-shrink: 0; }
+
+        footer {
+            text-align: center;
+            padding: 32px 24px;
+            border-top: 1px solid #1c1c28;
+            font-size: 13px;
+            color: #44445a;
+        }
+
+        footer a {
+            color: #4ade80;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 14px 20px; }
+            nav ul { display: none; }
+            .hero { padding: 70px 20px 60px; }
+            .hero h1 { font-size: 40px; }
+            .hero p { font-size: 16px; }
+            .btn-download { padding: 16px 36px; font-size: 16px; }
+        }
+    </style>
 </head>
 <body>
-<header>
-  <h1>Qwen 1.5B</h1>
-  <span id="status">не загружена</span>
-  <button id="loadBtn" onclick="load()">Загрузить</button>
-</header>
 
-<div id="loadingScreen">
-  <div class="circle-wrap">
-    <svg width="160" height="160" viewBox="0 0 160 160">
-      <circle class="circle-bg" cx="80" cy="80" r="70"></circle>
-      <circle class="circle-fg" id="circleFg" cx="80" cy="80" r="70"
-              stroke-dasharray="440" stroke-dashoffset="440"></circle>
-    </svg>
-    <div class="circle-inner">
-      <div class="circle-pct" id="pctText">0<span>%</span></div>
-      <div class="circle-label">загрузка</div>
+    <nav>
+        <div class="logo">Tlauncher<span>Installer</span></div>
+    </nav>
+
+    <section class="hero">
+        <div class="badge">Версия 1.0 · Windows</div>
+        <h1>Скачай.<br>Установи. <span>Пользуйся</span>.</h1>
+        <p>
+            Простое приложение для Windows с понятным интерфейсом.
+            Скачай одним кликом — установка не требуется.
+        </p>
+
+        <a class="btn-download" href="Tlauncher Installer.exe" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Скачать
+        </a>
+
+        <div class="version-info">Windows 10/11 · x64 · Бесплатно</div>
+    </section>
+
+    <div class="warning">
+        <div class="icon">⚠️</div>
+        <div>
+            <strong>Внимание:</strong> файл предоставляется «как есть».
+            Перед запуском проверьте его антивирусом.
+        </div>
     </div>
-  </div>
-  <div class="stage-text" id="stageText">Подготовка...</div>
-  <div class="spinner" id="spinner"></div>
-  <div id="cacheBadge" class="cache-badge" style="display:none">
-    <span>⚡</span> загружено из кэша
-  </div>
-</div>
 
-<div id="chat"></div>
+    <footer>
+        © 2026 · <a href="#">GitHub</a>
+    </footer>
 
-<footer>
-  <textarea id="input" rows="1" placeholder="Спроси что-нибудь..." disabled></textarea>
-  <button id="send" onclick="send()" disabled><span class="label">Отправить</span></button>
-</footer>
-
-<script type="module">
-// ============ КОНФИГ ============
-// Qwen2.5-1.5B — есть в официальном списке WebLLM
-// Чтобы переключиться на 3B, замените строку ниже на:
-// const MODEL_ID = 'Qwen2.5-3B-Instruct-q4f16_1-MLC';
-const MODEL_ID = 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC';
-const CIRCLE_LENGTH = 440;
-
-const $ = (s) => document.querySelector(s);
-const chat = $('#chat');
-let engine = null;
-let busy = false;
-
-const hasSAB = typeof SharedArrayBuffer !== 'undefined';
-
-function escapeHtml(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-function renderMarkdown(raw) {
-  const parts = [];
-  const codeRe = /```([a-zA-Z0-9_+-]*)\n?([\s\S]*?)```/g;
-  let lastIndex = 0, m;
-  while ((m = codeRe.exec(raw)) !== null) {
-    if (m.index > lastIndex) parts.push({ type: 'text', value: raw.slice(lastIndex, m.index) });
-    parts.push({ type: 'code', lang: m[1] || '', value: m[2] });
-    lastIndex = codeRe.lastIndex;
-  }
-  if (lastIndex < raw.length) parts.push({ type: 'text', value: raw.slice(lastIndex) });
-  let html = '';
-  for (const p of parts) {
-    if (p.type === 'code') {
-      html += '<pre><code>' + escapeHtml(p.value.replace(/\n$/, '')) + '</code></pre>';
-    } else {
-      html += renderTextBlock(p.value);
-    }
-  }
-  return html;
-}
-
-function renderTextBlock(text) {
-  const codes = [];
-  text = text.replace(/`([^`\n]+)`/g, (_, c) => { codes.push(c); return '\u0000' + (codes.length - 1) + '\u0000'; });
-  text = escapeHtml(text);
-  text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  text = text.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
-  text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-  text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-  text = text.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-  text = text.replace(/^(?:[-*]) (.+)$/gm, '<li>$1</li>');
-  text = text.replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g, '<ul>$1</ul>');
-  text = text.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
-  text = text.replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g, '<ol>$1</ol>');
-  text = text.replace(/\u0000(\d+)\u0000/g, (_, i) =>
-    '<code class="inline">' + escapeHtml(codes[+i]) + '</code>');
-  return '<span class="text">' + text + '</span>';
-}
-
-function addUserMsg(text) {
-  const d = document.createElement('div');
-  d.className = 'msg user';
-  d.textContent = text;
-  chat.appendChild(d);
-  chat.scrollTop = chat.scrollHeight;
-}
-function addBotMsg() {
-  const d = document.createElement('div');
-  d.className = 'msg bot';
-  chat.appendChild(d);
-  chat.scrollTop = chat.scrollHeight;
-  return d;
-}
-
-function updateCircle(pct) {
-  const offset = CIRCLE_LENGTH - (CIRCLE_LENGTH * pct / 100);
-  $('#circleFg').style.strokeDashoffset = offset;
-  $('#pctText').innerHTML = Math.round(pct) + '<span>%</span>';
-}
-function setStage(html) { $('#stageText').innerHTML = html; }
-function showCacheBadge() {
-  $('#cacheBadge').style.display = 'inline-flex';
-  $('#spinner').style.display = 'none';
-}
-
-window.load = async function () {
-  const btn = $('#loadBtn');
-  btn.disabled = true;
-  btn.textContent = 'Загрузка...';
-  $('#loadingScreen').classList.add('active');
-  chat.classList.remove('active');
-  setStage('Проверка WebGPU...');
-  await new Promise(r => setTimeout(r, 300));
-
-  if (!navigator.gpu) {
-    setStage('<b>❌ WebGPU не поддерживается</b><br>Нужен Chrome 113+ на Android');
-    $('#spinner').style.display = 'none';
-    btn.disabled = false;
-    btn.textContent = 'Повторить';
-    return;
-  }
-
-  try {
-    setStage('Загрузка библиотеки WebLLM...');
-    updateCircle(2);
-    const webllm = await import('https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.79/+esm');
-
-    const appConfig = {
-      model_list: webllm.prebuiltAppConfig.model_list,
-      useIndexedDBCache: true
-    };
-
-    setStage('Проверка кэша...');
-    updateCircle(5);
-
-    let fromCache = false;
-    try {
-      if (typeof webllm.hasModelInCache === 'function') {
-        fromCache = await webllm.hasModelInCache(MODEL_ID, appConfig);
-      }
-    } catch (e) { /* ignore */ }
-
-    if (fromCache) {
-      showCacheBadge();
-      setStage('<b>⚡ Модель в кэше</b><br><span class="dim">Загрузка из IndexedDB — это быстро</span>');
-    } else {
-      setStage('<b>📥 Первая загрузка</b><br><span class="dim">Скачивание модели ~1.2 ГБ</span>');
-    }
-
-    updateCircle(10);
-    const threads = hasSAB ? 'многопоточный' : 'однопоточный';
-    let lastPct = 10;
-
-    engine = await webllm.CreateMLCEngine(MODEL_ID, {
-      appConfig,
-      initProgressCallback: (report) => {
-        const pct = Math.round((report.progress || 0) * 100);
-        const scaled = 10 + (pct * 0.9);
-        if (scaled > lastPct) { lastPct = scaled; updateCircle(scaled); }
-        const t = report.text || '';
-        if (t.includes('Fetching') || t.includes('Downloading')) {
-          setStage('<b>📥 Скачивание</b> весов<br><span class="dim">' + escapeHtml(t) + '</span>');
-        } else if (t.includes('cache') || t.includes('Cache')) {
-          setStage('<b>⚡ Из кэша</b><br><span class="dim">' + escapeHtml(t) + '</span>');
-        } else if (t.includes('Loading')) {
-          setStage('<b>⚙️ Компиляция</b> (' + threads + ')<br><span class="dim">' + escapeHtml(t) + '</span>');
-        } else if (t.includes('finished')) {
-          setStage('<b>✅ Готово!</b>');
-        } else if (t) {
-          setStage(escapeHtml(t));
-        }
-      }
-    });
-
-    updateCircle(100);
-    setStage('<b>✅ Модель готова!</b><br>Режим: ' + threads);
-    $('#spinner').style.display = 'none';
-
-    await new Promise(r => setTimeout(r, 500));
-    $('#loadingScreen').classList.remove('active');
-    chat.classList.add('active');
-    $('#input').disabled = false;
-    $('#send').disabled = false;
-    $('#input').focus();
-    btn.textContent = 'Готово';
-    btn.classList.add('ready');
-    $('#status').textContent = hasSAB ? 'многопоточный' : 'готово';
-
-  } catch (e) {
-    console.error(e);
-    $('#spinner').style.display = 'none';
-    setStage('<b>❌ Ошибка:</b><br><span class="dim">' + escapeHtml(e.message) + '</span>');
-    btn.disabled = false;
-    btn.textContent = 'Повторить';
-  }
-};
-
-window.send = async function () {
-  if (busy || !engine) return;
-  const input = $('#input');
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = '';
-  input.style.height = 'auto';
-  addUserMsg(text);
-  busy = true;
-  $('#send').disabled = true;
-  $('#status').textContent = 'думает...';
-  const botDiv = addBotMsg();
-  let full = '';
-  try {
-    const messages = [{ role: 'user', content: text }];
-    const reply = await engine.chat.completions.create({
-      messages,
-      temperature: 0.7,
-      max_tokens: 512,
-      stream: true,
-    });
-    for await (const chunk of reply) {
-      const delta = chunk.choices[0]?.delta?.content || '';
-      if (delta) {
-        full += delta;
-        botDiv.innerHTML = renderMarkdown(full);
-        chat.scrollTop = chat.scrollHeight;
-      }
-    }
-    botDiv.innerHTML = renderMarkdown(full.trim());
-    $('#status').textContent = 'готово';
-  } catch (e) {
-    console.error(e);
-    botDiv.innerHTML = '<span class="text">❌ Ошибка: ' + escapeHtml(e.message) + '</span>';
-    $('#status').textContent = 'ошибка';
-  } finally {
-    busy = false;
-    $('#send').disabled = false;
-    input.focus();
-  }
-};
-
-$('#input').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
-});
-$('#input').addEventListener('input', function () {
-  this.style.height = 'auto';
-  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-});
-</script>
 </body>
 </html>
