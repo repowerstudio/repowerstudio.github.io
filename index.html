@@ -103,7 +103,7 @@
 <body>
 
     <section class="hero">
-        <h1>Tlauncher<br><span>Installer.</span></h1>
+        <h1>Tlauncher<br><span>Installer</span></h1>
         <p>
             Простое приложение для Windows. Один клик — и приложение у вас.
         </p>
